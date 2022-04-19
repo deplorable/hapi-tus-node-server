@@ -59,7 +59,7 @@
   "dependencies": {
     "@google-cloud/storage": "^5.19.2",
     "aws-sdk": "^2.1116.0",
-    "configstore": "^5.0.1",
+    "configstore": "^6.0.0",
     "debug": "^4.3.4",
     "simon": "^0.2.3"
   }

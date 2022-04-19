@@ -103,7 +103,7 @@ server.on(EVENTS.EVENT_UPLOAD_COMPLETE, (event) => {
 // app.use('/uploads', uploadApp);
 // app.get('*', writeFile);
 
-const host = '127.0.0.1';
+const host = '0.0.0.0';
 const port = 1080;
 server.listen({ host, port }, () => {
     console.log(`[${new Date().toLocaleTimeString()}] tus server listening at http://${host}:${port} using ${data_store}`);

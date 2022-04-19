@@ -1,10 +1,10 @@
 {
-  "name": "tus-node-server",
-  "description": "Node.js tus server",
+  "name": "hapi-tus-node-server",
+  "description": "Node.js tus server for HAPI",
   "version": "0.5.2",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tus/tus-node-server.git"
+    "url": "git+https://github.com/deplorable/hapi-tus-node-server.git"
   },
   "keywords": [
     "tus",
@@ -19,9 +19,9 @@
   "author": "Ben Stahl <bhstahl@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tus/tus-node-server/issues"
+    "url": "https://github.com/deplorable/hapi-tus-node-server/issues"
   },
-  "homepage": "https://github.com/tus/tus-node-server#readme",
+  "homepage": "https://github.com/deplorable/hapi-tus-node-server#readme",
   "engines": {
     "node": ">=10.0"
   },
@@ -57,9 +57,10 @@
     "tus-js-client": "^2.3.0"
   },
   "dependencies": {
-    "@google-cloud/storage": "^5.18.1",
-    "aws-sdk": "^2.1064.0",
+    "@google-cloud/storage": "^5.19.2",
+    "aws-sdk": "^2.1116.0",
     "configstore": "^5.0.1",
-    "debug": "^4.3.3"
+    "debug": "^4.3.4",
+    "simon": "^0.2.3"
   }
 }

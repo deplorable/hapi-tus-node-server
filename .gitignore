@@ -45,4 +45,5 @@ keyfile.json
 
 # Demo files
 demo-express/node_modules
+demo-koa/node_modules
 

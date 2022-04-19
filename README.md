@@ -1,6 +1,6 @@
-# tus-node-server
-[![npm version](https://badge.fury.io/js/tus-node-server.svg)](https://badge.fury.io/js/tus-node-server)
-[![Build Status](https://github.com/tus/tus-node-server/actions/workflows/ci.yml/badge.svg)](https://github.com/tus/tus-node-server/actions/workflows/ci.yml)
+# hapi-tus-node-server
+
+HAPI-compatible fork of [tus-node-server](https://github.com/tus/tus-node-server).
 
 tus is a new open protocol for resumable uploads built on HTTP. This is the [tus protocol 1.0.0](http://tus.io/protocols/resumable-upload.html) node.js server implementation.
 

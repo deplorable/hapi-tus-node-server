@@ -7,7 +7,7 @@ tus is a new open protocol for resumable uploads built on HTTP. This is the [tus
 ## Installation
 
 ```bash
-$ npm install tus-node-server
+$ npm install hapi-tus-node-server
 ```
 
 ## Flexible Data Stores
@@ -46,49 +46,7 @@ $ npm install tus-node-server
 
 ## Quick Start
 
-#### Use the [tus-node-deploy](https://hub.docker.com/r/bhstahl/tus-node-deploy/) Docker image
-
-```sh
-$ docker run -p 1080:8080 -d bhstahl/tus-node-deploy
-```
-
-#### Build a standalone server yourself
-```js
-const tus = require('tus-node-server');
-
-const server = new tus.Server();
-server.datastore = new tus.FileStore({
-    path: '/files'
-});
-
-const host = '127.0.0.1';
-const port = 1080;
-server.listen({ host, port }, () => {
-    console.log(`[${new Date().toLocaleTimeString()}] tus server listening at http://${host}:${port}`);
-});
-```
-
-#### Use tus-node-server as [Express Middleware](http://expressjs.com/en/guide/using-middleware.html)
-
-```js
-const tus = require('tus-node-server');
-const server = new tus.Server();
-server.datastore = new tus.FileStore({
-    path: '/files'
-});
-
-const express = require('express');
-const app = express();
-const uploadApp = express();
-uploadApp.all('*', server.handle.bind(server));
-app.use('/uploads', uploadApp);
-
-const host = '127.0.0.1';
-const port = 1080;
-app.listen(port, host);
-```
-
-#### Use tus-node-server with [Koa](https://github.com/koajs/koa) or plain Node server
+#### Use tus-node-server with [Hapi](https://github.com/hapijs/hapi)
 
 ```js
 const http = require('http');
@@ -117,97 +75,6 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(port)
-```
-
-## Features
-#### Events:
-
-Execute code when lifecycle events happen by adding event handlers to your server.
-
-```js
-const Server = require('tus-node-server').Server;
-const EVENTS = require('tus-node-server').EVENTS;
-
-const server = new Server();
-server.on(EVENTS.EVENT_UPLOAD_COMPLETE, (event) => {
-    console.log(`Upload complete for file ${event.file.id}`);
-});
-```
-
-- `EVENT_FILE_CREATED`: Fired when a `POST` request successfully creates a new file
-
-    _Example payload:_
-    ```
-    {
-        file: {
-            id: '7b26bf4d22cf7198d3b3706bf0379794',
-            upload_length: '41767441',
-            upload_metadata: 'filename NDFfbWIubXA0'
-         }
-    }
-    ```
-
-- `EVENT_ENDPOINT_CREATED`: Fired when a `POST` request successfully creates a new upload endpoint
-
-    _Example payload:_
-    ```
-    {
-        url: 'http://localhost:1080/files/7b26bf4d22cf7198d3b3706bf0379794'
-    }
-    ```
-
-- `EVENT_UPLOAD_COMPLETE`: Fired when a `PATCH` request finishes writing the file
-
-    _Example payload:_
-    ```
-    {
-        file: {
-            id: '7b26bf4d22cf7198d3b3706bf0379794',
-            upload_length: '41767441',
-            upload_metadata: 'filename NDFfbWIubXA0'
-        }
-    }
-    ```
-    
-- `EVENT_FILE_DELETED`: Fired when a `DELETE` request finishes deleting the file
-
-    _Example payload:_
-    ```
-    {
-        file_id: '7b26bf4d22cf7198d3b3706bf0379794'
-           
-    }
-    ```
-
-#### Custom `GET` handlers:
-Add custom `GET` handlers to suit your needs, similar to [Express routing](https://expressjs.com/en/guide/routing.html).
-```js
-const server = new Server();
-server.get('/uploads', (req, res) => {
-    // Read from your DataStore
-    fs.readdir(server.datastore.path, (err, files) => {
-        // Format the JSON response and send it
-    }
-});
-```
-
-#### Custom file names:
-
-The default naming of files is a random crypto hex string. When using your own `namingFunction`, make sure to create URL friendly names such as removing spaces.
-
-```js
-const crypto = require('crypto');
-
-// req is http.IncomingMessage
-const randomString = (req) => {
-    // same as the default implementation
-    return crypto.randomBytes(16).toString('hex');
-}
-
-server.datastore = new tus.FileStore({
-    path: '/files',
-    namingFunction: randomString
-});
 ```
 
 ## Development

@@ -19,9 +19,6 @@ const host = '0.0.0.0';
 const tusServer = new tus.Server();
 const data_store = process.env.DATA_STORE || 'FileStore';
 
-
-
-
 switch (data_store) {
     case 'GCSDataStore':
         tusServer.datastore = new GCSDataStore({
@@ -63,9 +60,9 @@ switch (data_store) {
  * @param  {object} req http.incomingMessage
  * @param  {object} res http.ServerResponse
  */
-const writeFile = (req, res) => {
+const writeFile = (request, h) => {
     // Determine file to serve
-    let filename = req.url;
+    let filename = request.path;
 console.log(filename);
     if (filename == '/') {
         filename = '/index.html';
@@ -74,148 +71,152 @@ console.log(filename);
         filename = '/demos/browser' + filename;
     }
     filename = path.join(process.cwd(), '/node_modules/tus-js-client', filename);
-    fs.readFile(filename, 'binary', (err, file) => {
-        if (err) {
-            res.writeHead(500, { 'Content-Type': 'text/plain' });
-            res.write(err);
-            res.end();
-            return;
-        }
-
-        // Update demo URL to point to our local server
-        file = file.replace(env.LOCAL_SERVER+'/files/', `http://${host}:${port}/files/`)
-
-        res.writeHead(200);
-        res.write(file);
-        res.end();
-    });
+    try {
+      let file = fs.readFileSync(filename, { encoding:  'binary' });
+      // Update demo URL to point to our local server
+      file = file.replace(env.LOCAL_SERVER+'/files/', `http://${host}:${port}/files/`)
+      return h.response(file).code(200);
+    } catch (err) {
+      return h.response(err).type('text/plain').code(500);
+    }
 };
 
 
+const initServer = async () => {
 
-/*
-app.use(ctx => {
-  ctx.body = 'Hello Koa';
-});
-*/
+  const server = Hapi.server({
+    port: port,
+    host: host
+  });
 
+  server.decorate("server", "fileServer", tusServer);
+  server.decorate("request", "tus", tusServer);
 
-/*
-router.get('/', ctx=>{
-  ctx.respond = false; 
-  return writeFile(ctx.req, ctx.res)
-});
+  server.route({
+    method: 'GET',
+    path: '/',
+    handler: async (request, h) =>{
+      return writeFile(request, h)
+    }
+  });
 
-router.get('/index.html', ctx=>{
-  ctx.respond = false;
-  return writeFile(ctx.req, ctx.res)
-});
+  server.route({
+    method: 'GET',
+    path: '/index.html',
+    handler: async (request, h) =>{
+      return writeFile(request,h)
+    }
+  });
 
-router.get('/demo.js', ctx=>{
-  ctx.respond = false;
-  return writeFile(ctx.req, ctx.res)
-});
+  server.route({
+    method: 'GET',
+    path: '/demo.js',
+    handler: async (request, h) =>{
+      return writeFile(request,h)
+    }
+  });
 
-router.get('/demo.css', ctx=>{
-  ctx.respond = false;
-  return writeFile(ctx.req, ctx.res)
-});
+  server.route({
+    method: 'GET',
+    path: '/demo.css',
+    handler: async (request, h) =>{
+      return writeFile(request,h)
+    }
+  });
 
-router.get('/video.html', ctx=>{
-  ctx.respond = false;
-  return writeFile(ctx.req, ctx.res)
-});
+  server.route({
+    method: 'GET',
+    path: '/video.html',
+    handler: async (request, h) =>{
+      return writeFile(request,h)
+    }
+  });
 
-router.get('/video.js', ctx=>{
-  ctx.respond = false;
-  return writeFile(ctx.req, ctx.res)
-});
+  server.route({
+    method: 'GET',
+    path: '/video.js',
+    handler: async (request, h) =>{
+      return writeFile(request,h)
+    }
+  });
 
-router.get('/dist/tus.js', ctx=>{
-  ctx.respond = false;
-  return writeFile(ctx.req, ctx.res)
-});
+  server.route({
+    method: 'GET',
+    path: '/dist/tus.js',
+    handler: async (request, h) =>{
+      return writeFile(request,h)
+    }
+  });
 
-router.get('/dist/tus.js.map', ctx=>{
-  ctx.respond = false;
-  return writeFile(ctx.req, ctx.res)
-});
+  server.route({
+    method: 'GET',
+    path: '/dist/tus.js.map',
+    handler: async (request, h) =>{
+      return writeFile(request,h)
+    }
+  });
 
-router.get('/dist/tus.min.js', ctx=>{
-  ctx.respond = false;
-  return writeFile(ctx.req, ctx.res)
-});
+  server.route({
+    method: 'GET',
+    path: '/dist/tus.min.js',
+    handler: async (request, h) =>{
+      return writeFile(request,h)
+    }
+  });
 
-router.get('/dist/tus.min.js.map', ctx=>{
-  ctx.respond = false;
-  return writeFile(ctx.req, ctx.res)
-});
-*/
+  server.route({
+    method: 'GET',
+    path: '/dist/tus.min.js.map',
+    handler: async (request, h) =>{
+      return writeFile(request,h)
+    }
+  });
 
+  server.route({
+    method: 'POST',
+    path: '/files/:file_id',
+    handler: async (request, h) =>{
+      console.log("poster");
+      return tusServer.handle(request.raw.req, request.raw.res)
+    }
+  });
 
+  server.route({
+    method: 'POST',
+    path: '/files/',
+    handler: async (request, h) =>{
+      return tusServer.handle(request.raw.req, request.raw.res)
+    }
+  });
 
+  server.route({
+    method: 'PATCH',
+    path: '/files/:file_id',
+    handler: async (request, h) =>{
+      console.log("patch");
+      return tusServer.handle(request.raw.req, request.raw.res)
+    }
+  });
 
+  server.route({
+    method: 'GET',
+    path: '/files/:file_id',
+    handler: async (request, h)=>{
+      console.log("get");
+      return tusServer.handle(request.raw.req, request.raw.res)
+    }
+  });
 
-/*
-app.get('/', writeFile);
-app.get('/index.html', writeFile);
-app.get('/demo.js', writeFile);
-app.get('/demo.css', writeFile);
-app.get('/video.html', writeFile);
-app.get('/video.js', writeFile);
-app.get('/dist/tus.js', writeFile);
-app.get('/dist/tus.js.map', writeFile);
-app.get('/dist/tus.min.js', writeFile);
-app.get('/dist/tus.min.js.map', writeFile);
-*/
-
-
-/*
-router.post('/files/:file_id', (ctx,next)=>{
-  console.log("poster");
-  ctx.respond = false;
-  return tusServer.handle(ctx.req, ctx.res)
-});
-
-router.post('/files/', async (ctx,next)=>{
-  //ctx.respond = false;
-  return tusServer.handle(ctx.req, ctx.res)
-});
-
-router.patch('/files/:file_id', async (ctx,next)=>{
-  console.log("patch");
-  return tusServer.handle(ctx.req, ctx.res)
-});
-
-router.get('/files/:file_id', async (ctx,next)=>{
-  console.log("get");
-  return tusServer.handle(ctx.req, ctx.res)
-});
-
-
-
-app.use(router.routes());
-*/
-
-const init = async () => {
-
-    const server = Hapi.server({
-        port: port,
-        host: host
-    });
-
-    await server.start();
-    console.log(`[${new Date().toLocaleTimeString()}] tus server listening at %s using ${data_store}`, server.info.uri);
-
+  await server.start();
+  console.log(`[${new Date().toLocaleTimeString()}] tus server listening at %s using ${data_store}`, server.info.uri);
 };
 
 process.on('unhandledRejection', (err) => {
-
     console.log(err);
     process.exit(1);
 });
 
-init();
+initServer();
 
 
 

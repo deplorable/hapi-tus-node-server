@@ -52,14 +52,14 @@
     "nyc": "^15.1.0",
     "rimraf": "^3.0.2",
     "should": "^13.2.3",
-    "sinon": "^13.0.1",
+    "sinon": "^13.0.2",
     "supertest": "^6.2.2",
     "tus-js-client": "^2.3.0"
   },
   "dependencies": {
-    "@google-cloud/storage": "^5.19.2",
-    "aws-sdk": "^2.1116.0",
-    "configstore": "^5.0.1",
+    "@google-cloud/storage": "^5.19.3",
+    "aws-sdk": "^2.1118.0",
+    "configstore": "^6.0.0",
     "debug": "^4.3.4",
     "simon": "^0.2.3"
   }

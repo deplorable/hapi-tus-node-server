@@ -13,6 +13,9 @@ const dotenv = require('dotenv').config();
 const env = dotenv.parsed || {};
 console.log(env);
 
+const MAX_REQUEST_SIZE_IN_MEGABYTES = 30;
+const MAX_REQUEST_SIZE_IN_BYTES = Math.round(MAX_REQUEST_SIZE_IN_MEGABYTES * 1024 * 1024);
+
 const port = 1080;
 const host = '0.0.0.0';
 
@@ -174,10 +177,10 @@ const initServer = async () => {
 
   server.route({
     method: 'POST',
-    path: '/files/:file_id',
+    path: '/files/{file_id}',
     handler: async (request, h) =>{
-      console.log("poster");
-      return tusServer.handle(request.raw.req, request.raw.res)
+      console.log("POST /files/:file_id");
+      return await tusServer.handle(request.raw.req, request.raw.res)
     }
   });
 
@@ -185,25 +188,52 @@ const initServer = async () => {
     method: 'POST',
     path: '/files/',
     handler: async (request, h) =>{
-      return tusServer.handle(request.raw.req, request.raw.res)
+      console.log("POST /files/");
+      await tusServer.handle(request.raw.req, request.raw.res)
+      return h.close
     }
   });
 
   server.route({
     method: 'PATCH',
+    path: '/files/{file_id}',
+    options: {
+      payload: {
+        output: 'stream',
+        parse: false,
+        maxBytes: MAX_REQUEST_SIZE_IN_BYTES
+      }
+    },
+    handler: async (request, h) =>{
+      console.log("PATCH /files/:file_id");
+      await tusServer.handle(request.raw.req, request.raw.res)
+      return h.close
+    }
+  });
+
+  server.route({
+    method: 'OPTIONS',
     path: '/files/:file_id',
     handler: async (request, h) =>{
-      console.log("patch");
-      return tusServer.handle(request.raw.req, request.raw.res)
+      console.log("OPTIONS /files/:file_id");
+      await tusServer.handle(request.raw.req, request.raw.res)
+      return h.close
     }
   });
 
   server.route({
     method: 'GET',
-    path: '/files/:file_id',
+    path: '/files/{file_id}',
     handler: async (request, h)=>{
-      console.log("get");
-      return tusServer.handle(request.raw.req, request.raw.res)
+      console.log("GET /files/:file_id");
+      console.log(request.method);
+      if (request.method.toLowerCase() === "head") {
+        await request.tus.handle(request.raw.req, request.raw.res);
+        return h.close;
+      } else {
+         await tusServer.handle(request.raw.req, request.raw.res)
+        return h.close;
+      }
     }
   });
 

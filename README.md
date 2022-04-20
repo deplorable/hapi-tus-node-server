@@ -49,32 +49,42 @@ $ npm install hapi-tus-node-server
 #### Use tus-node-server with [Hapi](https://github.com/hapijs/hapi)
 
 ```js
-const http = require('http');
-const url = require('url');
-const Koa = require('koa')
-const tus = require('tus-node-server');
-const tusServer = new tus.Server();
+const Hapi = require('@hapi/hapi')
+const HapiTus = require('hapi-tus-node-server');
+const FileStore = require('hapi-tus-node-server').FileStore;
 
-const app = new Koa();
-const appCallback = app.callback();
 const port = 1080;
+const host = '0.0.0.0';
 
-tusServer.datastore = new tus.FileStore({
-    path: '/files',
+const initServer = async () => {
+
+  const server = Hapi.server({
+    port: port,
+    host: host
+  });
+
+  let tusOptions = {
+    limits: {
+      MAX_REQUEST_SIZE_IN_MEGABYTES: 60,
+    },
+    datastore: new FileStore({
+      path: '/files',
+      absoluteLocation: 'http://192.168.0.20:1080'
+    });
+  };
+
+  await server.register({ plugin: HapiTus, options: tusOptions } );
+  await server.start();
+  console.log(`[${new Date().toLocaleTimeString()}] tus server listening at %s using FileStore`, server.info.uri);
+};
+
+process.on('unhandledRejection', (err) => {
+  console.log(err);
+  process.exit(1);
 });
 
-const server = http.createServer((req, res) => {
-    const urlPath = url.parse(req.url).pathname;
+initServer();
 
-    // handle any requests with the `/files/*` pattern
-    if (/^\/files\/.+/.test(urlPath.toLowerCase())) {
-        return tusServer.handle(req, res);
-    }
-
-    appCallback(req, res);
-});
-
-server.listen(port)
 ```
 
 ## Development

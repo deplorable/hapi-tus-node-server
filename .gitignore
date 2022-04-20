@@ -44,7 +44,6 @@ keyfile.json
 
 
 # Demo files
-demo-express/node_modules
-demo-koa/node_modules
-demo-hapi/node_modules
-
+demo/node_modules
+demo/files
+demo/files/

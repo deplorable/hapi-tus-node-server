@@ -238,6 +238,25 @@ const initServer = async () => {
     }
   });
 
+  server.route({
+    method: 'DELETE',
+    path: '/files/{file_id}',
+    options: {
+      cors: {
+        headers: [
+          // These are the default Access-Control-Allow-Headers
+          'Accept', 'Authorization', 'Content-Type', 'If-None-Match',
+          // These are the ones specific to Tus
+          'tus-resumable', 'upload-length', 'upload-metadata'
+        ]
+      }
+    },
+    handler: async (request, h)=>{
+      console.log("DELETE /files/:file_id");
+      return await request.tus.handle(request, h);
+    }
+  });
+
   await server.start();
   console.log(`[${new Date().toLocaleTimeString()}] tus server listening at %s using ${data_store}`, server.info.uri);
 };

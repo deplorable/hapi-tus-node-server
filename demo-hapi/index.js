@@ -51,6 +51,7 @@ switch (data_store) {
     default:
         tusServer.datastore = new FileStore({
             path: '/files',
+            absoluteLocation: 'http://192.168.20.40:1080'
         });
 }
 
@@ -180,7 +181,7 @@ const initServer = async () => {
     path: '/files/{file_id}',
     handler: async (request, h) =>{
       console.log("POST /files/:file_id");
-      return await tusServer.handle(request.raw.req, request.raw.res)
+      return await tusServer.handle(request, h)
     }
   });
 
@@ -189,8 +190,8 @@ const initServer = async () => {
     path: '/files/',
     handler: async (request, h) =>{
       console.log("POST /files/");
-      await tusServer.handle(request.raw.req, request.raw.res)
-      return h.close
+      return await tusServer.handle(request, h)
+      //return h.close
     }
   });
 
@@ -206,8 +207,8 @@ const initServer = async () => {
     },
     handler: async (request, h) =>{
       console.log("PATCH /files/:file_id");
-      await tusServer.handle(request.raw.req, request.raw.res)
-      return h.close
+      return await tusServer.handle(request,h)
+      //return h.close
     }
   });
 
@@ -216,8 +217,8 @@ const initServer = async () => {
     path: '/files/:file_id',
     handler: async (request, h) =>{
       console.log("OPTIONS /files/:file_id");
-      await tusServer.handle(request.raw.req, request.raw.res)
-      return h.close
+      return await tusServer.handle(request, h)
+      //return h.close
     }
   });
 
@@ -228,11 +229,11 @@ const initServer = async () => {
       console.log("GET /files/:file_id");
       console.log(request.method);
       if (request.method.toLowerCase() === "head") {
-        await request.tus.handle(request.raw.req, request.raw.res);
+        await request.tus.handle(request, h);
         return h.close;
       } else {
-        return await tusServer.handle(request.raw.req, request.raw.res)
-        //return h.close;
+        return await tusServer.handle(request, h)
+        return h.close;
       }
     }
   });

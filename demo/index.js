@@ -1,12 +1,10 @@
-const http = require('http');
-const url = require('url');
 const Hapi = require('@hapi/hapi')
 const HapiTus = require('../lib/index');
 //const tus = require('../index');
-const FileStore = require('../lib/tus').FileStore;
-const GCSDataStore = require('../lib/tus').GCSDataStore;
-const S3Store = require('../lib/tus').S3Store;
-const EVENTS = require('../lib/tus').EVENTS;
+const FileStore = require('../lib/index').FileStore;
+const GCSDataStore = require('../lib/index').GCSDataStore;
+const S3Store = require('../lib/index').S3Store;
+const EVENTS = require('../lib/index').EVENTS;
 const path = require('path');
 const fs = require('fs');
 const assert = require('assert');
@@ -19,7 +17,8 @@ console.log(env);
 const port = 1080;
 const host = '0.0.0.0';
 const publicSite = process.env.TUS_PUBLIC_SITE || `http://${host}:${port}`;
-const publicPath = process.env.TUS_PUBLIC_PATH || `/files`;
+let publicPath = process.env.TUS_PUBLIC_PATH || `/files/`; //must have trailing slash
+if (publicPath.lastIndexOf("/") !== (publicPath.length-1)) publicPath = `${publicPath}/`;
 const publicUrl = `${publicSite}${publicPath}`;
 const localPath = process.env.TUS_LOCAL_PATH || `/files`;
 

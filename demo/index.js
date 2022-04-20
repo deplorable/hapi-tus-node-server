@@ -12,10 +12,25 @@ const fs = require('fs');
 const assert = require('assert');
 const dotenv = require('dotenv').config();
 const env = dotenv.parsed || {};
+
+console.log("Environment Variables:")
 console.log(env);
 
 const port = 1080;
 const host = '0.0.0.0';
+const publicSite = process.env.TUS_PUBLIC_SITE || `http://${host}:${port}`;
+const publicPath = process.env.TUS_PUBLIC_PATH || `/files`;
+const publicUrl = `${publicSite}${publicPath}`;
+const localPath = process.env.TUS_LOCAL_PATH || `/files`;
+
+console.log("\nConfiguration:");
+console.log({
+  publicSite,
+  publicPath,
+  publicUrl,
+  localPath
+});
+
 
 //const tusServer = new tus.Server();
 
@@ -29,7 +44,6 @@ const host = '0.0.0.0';
 const writeFile = (request, h) => {
     // Determine file to serve
     let filename = request.path;
-    console.log(filename);
     if (filename == '/') {
         filename = '/index.html';
     }
@@ -40,7 +54,7 @@ const writeFile = (request, h) => {
     try {
       let file = fs.readFileSync(filename, { encoding:  'binary' });
       // Update demo URL to point to our local server
-      file = file.replace(env.LOCAL_SERVER+'/files/', `http://${host}:${port}/files/`)
+      file = file.replace('https://tusd.tusdemo.net/files/', publicUrl)
       return h.response(file).code(200);
     } catch (err) {
       return h.response(err).type('text/plain').code(500);
@@ -56,7 +70,7 @@ const initServer = async () => {
 
   let tusOptions = {
     limits: {
-      MAX_REQUEST_SIZE_IN_MEGABYTES: 30,
+      MAX_REQUEST_SIZE_IN_MEGABYTES: 60,
     },
     datastore: {}
   };
@@ -66,7 +80,7 @@ const initServer = async () => {
   switch (data_store) {
     case 'GCSDataStore':
       tusOptions.datastore = new GCSDataStore({
-        path: '/files',
+        path: localPath, //e.g. '/files'
         projectId: 'vimeo-open-source',
         keyFilename: path.resolve(__dirname, '../keyfile.json'),
         bucket: 'tus-node-server',
@@ -80,7 +94,7 @@ const initServer = async () => {
         assert.ok(process.env.AWS_REGION, 'environment variable `AWS_REGION` must be set');
 
         tusOptions.datastore = new S3Store({
-          path: '/files',
+          path: localPath, //e.g. '/files'
           bucket: process.env.AWS_BUCKET,
           accessKeyId: process.env.AWS_ACCESS_KEY_ID,
           secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -91,8 +105,8 @@ const initServer = async () => {
 
     default:
       tusOptions.datastore = new FileStore({
-        path: '/files',
-        absoluteLocation: 'http://192.168.20.40:1080'
+        path: localPath, //e.g. '/files'
+        absoluteLocation: publicSite //e.g. 'http://192.168.20.40:1080'
       });
   }
 

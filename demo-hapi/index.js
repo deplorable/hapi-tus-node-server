@@ -231,8 +231,8 @@ const initServer = async () => {
         await request.tus.handle(request.raw.req, request.raw.res);
         return h.close;
       } else {
-         await tusServer.handle(request.raw.req, request.raw.res)
-        return h.close;
+        return await tusServer.handle(request.raw.req, request.raw.res)
+        //return h.close;
       }
     }
   });

@@ -10,40 +10,6 @@ tus is a new open protocol for resumable uploads built on HTTP. This is the [tus
 $ npm install hapi-tus-node-server
 ```
 
-## Flexible Data Stores
-
-- **Local File Storage**
-    ```js
-    server.datastore = new tus.FileStore({
-        path: '/files'
-    });
-    ```
-
-- **Google Cloud Storage**
-    ```js
-
-    server.datastore = new tus.GCSDataStore({
-        path: '/files',
-        projectId: 'project-id',
-        keyFilename: 'path/to/your/keyfile.json',
-        bucket: 'bucket-name',
-    });
-    ```
-
-- **Amazon S3**
-    ```js
-
-    server.datastore = new tus.S3Store({
-        path: '/files',
-        bucket: 'bucket-name',
-        accessKeyId: 'access-key-id',
-        secretAccessKey: 'secret-access-key',
-        region: 'eu-west-1',
-        partSize: 8 * 1024 * 1024, // each uploaded part will have ~8MB,
-        tmpDirPrefix: 'tus-s3-store',
-    });
-    ```
-
 ## Quick Start
 
 #### Use tus-node-server with [Hapi](https://github.com/hapijs/hapi)
@@ -51,7 +17,6 @@ $ npm install hapi-tus-node-server
 ```js
 const Hapi = require('@hapi/hapi')
 const HapiTus = require('hapi-tus-node-server');
-const FileStore = require('hapi-tus-node-server').FileStore;
 
 const port = 1080;
 const host = '0.0.0.0';
@@ -72,7 +37,7 @@ const initServer = async () => {
     limits: {
       maxRequestSizeInMegabytes: 60
     },
-    datastore: new FileStore({
+    datastore: new HapiTus.FileStore({
       path: '/files',
       absoluteLocation: 'http://192.168.0.20:1080'
     });
@@ -92,6 +57,40 @@ initServer();
 
 ```
 
+## Flexible Data Stores
+
+- **Local File Storage**
+    ```js
+    server.datastore = new HapiTus.FileStore({
+        path: '/files'
+    });
+    ```
+
+- **Google Cloud Storage**
+    ```js
+
+    server.datastore = new HapiTus.GCSDataStore({
+        path: '/files',
+        projectId: 'project-id',
+        keyFilename: 'path/to/your/keyfile.json',
+        bucket: 'bucket-name',
+    });
+    ```
+
+- **Amazon S3**
+    ```js
+
+    server.datastore = new HapiTus.S3Store({
+        path: '/files',
+        bucket: 'bucket-name',
+        accessKeyId: 'access-key-id',
+        secretAccessKey: 'secret-access-key',
+        region: 'eu-west-1',
+        partSize: 8 * 1024 * 1024, // each uploaded part will have ~8MB,
+        tmpDirPrefix: 'tus-s3-store',
+    });
+    ```
+
 ## Development
 
 Start the demo server using Local File Storage
@@ -104,7 +103,7 @@ Or start up the demo server using Google Cloud Storage
 $ npm run gcs_demo
 ```
 
-Then navigate to the demo ([localhost:1080](http://localhost:1080)) which uses [`tus-js-client`](https://github.com/tus/tus-js-client)
+Then navigate to the demo ([127.0.0.1:1080](http://127.0.0.1:1080)) which uses [`tus-js-client`](https://github.com/tus/tus-js-client)
 
 # Environment Variables in .env file
 

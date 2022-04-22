@@ -19,7 +19,7 @@ const Hapi = require('@hapi/hapi')
 const HapiTus = require('hapi-tus-node-server');
 
 const port = 1080;
-const host = '0.0.0.0';
+const host = '127.0.0.1'; // or '0.0.0.0' to listen on all interfaces
 
 const initServer = async () => {
 

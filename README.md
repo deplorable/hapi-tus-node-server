@@ -39,7 +39,7 @@ const initServer = async () => {
     },
     datastore: new HapiTus.FileStore({
       path: '/files',
-      absoluteLocation: 'http://192.168.0.20:1080'
+      absoluteLocation: 'http://127.0.0.1:1080'
     });
   };
 

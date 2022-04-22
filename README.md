@@ -61,11 +61,16 @@ const initServer = async () => {
   const server = Hapi.server({
     port: port,
     host: host
+    routes: {
+      payload: {
+        allow: ['application/json', 'application/x-www-form-urlencoded', 'application/offset+octet-stream', 'multipart/form-data']
+      }
+    }
   });
 
   let tusOptions = {
     limits: {
-      MAX_REQUEST_SIZE_IN_MEGABYTES: 60,
+      maxRequestSizeInMegabytes: 60
     },
     datastore: new FileStore({
       path: '/files',
@@ -100,3 +105,13 @@ $ npm run gcs_demo
 ```
 
 Then navigate to the demo ([localhost:1080](http://localhost:1080)) which uses [`tus-js-client`](https://github.com/tus/tus-js-client)
+
+# Environment Variables in .env file
+
+An example `.env.example` file is provided, which can be renamed to `.env` if you do not wish to set environment variables in your shell manually.
+
+```
+TUS_PUBLIC_SITE=http://127.0.0.1:1080
+TUS_PUBLIC_PATH=/files
+TUS_LOCAL_PATH=/files
+```

@@ -61,7 +61,7 @@ initServer();
 
 - **Local File Storage**
     ```js
-    server.datastore = new HapiTus.FileStore({
+    tusOptions.datastore = new HapiTus.FileStore({
         path: '/files'
     });
     ```
@@ -69,7 +69,7 @@ initServer();
 - **Google Cloud Storage**
     ```js
 
-    server.datastore = new HapiTus.GCSDataStore({
+    tusOptions.datastore = new HapiTus.GCSDataStore({
         path: '/files',
         projectId: 'project-id',
         keyFilename: 'path/to/your/keyfile.json',
@@ -80,7 +80,7 @@ initServer();
 - **Amazon S3**
     ```js
 
-    server.datastore = new HapiTus.S3Store({
+    tusOptions.datastore = new HapiTus.S3Store({
         path: '/files',
         bucket: 'bucket-name',
         accessKeyId: 'access-key-id',
